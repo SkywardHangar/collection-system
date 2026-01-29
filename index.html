@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收藏管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background: #f0f0f0;
+        }
+        .btn-primary {
+            background: #333;
+            color: #fff;
+            border-color: #333;
+        }
+        .btn-primary:hover {
+            background: #555;
+        }
+        .btn-danger {
+            color: #c00;
+            border-color: #c00;
+        }
+        .btn-danger:hover {
+            background: #fee;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .tab:hover {
+            background: #f5f5f5;
+        }
+        .tab.active {
+            border-bottom-color: #333;
+            font-weight: 600;
+        }
+        .panel {
+            display: none;
+            background: #fff;
+            padding: 20px;
+            min-height: 400px;
+        }
+        .panel.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f9f9f9;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #fafafa;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .modal-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+        .login-box {
+            background: #fff;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+        }
+        .login-box h2 {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .preview-mode {
+            background: #fffbe6;
+            padding: 10px 20px;
+            text-align: center;
+            border-bottom: 1px solid #ffe58f;
+            font-size: 14px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .card-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .checkbox-cell {
+            width: 40px;
+        }
+        .checkbox-cell input {
+            width: 16px;
+            height: 16px;
+        }
+        .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .batch-bar {
+            background: #f9f9f9;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .image-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ddd;
+        }
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-item .remove-img {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .detail-images {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .detail-images img {
+            height: 150px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .detail-main-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            width: 120px;
+            font-weight: 500;
+            color: #666;
+        }
+        .detail-value {
+            flex: 1;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .text-muted {
+            color: #999;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            header {
+                padding: 10px 15px;
+            }
+            header h1 {
+                font-size: 1.2rem;
+            }
+            .panel {
+                padding: 15px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .table-responsive {
+                overflow-x: auto;
+            }
+            .hide-mobile {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2>收藏管理系统</h2>
+            <div class="form-group">
+                <label>请输入密码</label>
+                <div style="position:relative">
+                    <input type="password" id="passwordInput" placeholder="输入密码进入系统" style="padding-right:60px">
+                    <button type="button" id="togglePwdBtn" onclick="togglePasswordVisibility()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;cursor:pointer;font-size:12px;padding:4px 8px">显示</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
+                    <input type="checkbox" id="rememberMe" style="width:16px;height:16px">
+                    <span>记住我（本设备6小时内免密登录）</span>
+                </label>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="login()">进入系统</button>
+            <p style="margin-top:15px;text-align:center">
+                <a href="#" onclick="enterPreview()" style="color:#666;font-size:14px">以预览模式查看</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="mainPage" class="hidden">
+        <!-- 预览模式提示 -->
+        <div id="previewBanner" class="preview-mode hidden">
+            当前为预览模式，仅可查看数据
+            <button class="btn btn-sm" style="margin-left:10px" onclick="showLoginFromPreview()">进入系统</button>
+        </div>
+
+        <header>
+            <h1>收藏管理系统</h1>
+            <div class="actions">
+                <button class="btn" id="exportBtn" onclick="exportData()">导出数据</button>
+                <button class="btn" id="importBtn" onclick="document.getElementById('importFile').click()">导入数据</button>
+                <input type="file" id="importFile" accept=".html,.json" style="display:none" onchange="importData(event)">
+                <button class="btn" id="logoutBtn" onclick="logout()">退出</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="collections">收藏品</button>
+            <button class="tab" data-tab="categories">分类管理</button>
+            <button class="tab" data-tab="folders">文件夹管理</button>
+            <button class="tab" data-tab="currencies">币种管理</button>
+        </div>
+
+        <!-- 收藏品面板 -->
+        <div id="collectionsPanel" class="panel active">
+            <div class="filter-bar">
+                <select id="filterCategory" onchange="filterCollections()">
+                    <option value="">全部分类</option>
+                </select>
+                <select id="filterFolder" onchange="filterCollections()">
+                    <option value="">全部文件夹</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="搜索名称或编号" style="padding:8px 12px;border:1px solid #ddd" onkeyup="filterCollections()">
+                <button class="btn btn-primary edit-only" onclick="showAddCollection()">新增收藏品</button>
+            </div>
+
+            <div id="batchBar" class="batch-bar hidden edit-only">
+                <span id="selectedCount">已选择 0 项</span>
+                <select id="batchCategory" style="padding:6px 10px">
+                    <option value="">选择分类</option>
+                </select>
+                <select id="batchFolder" style="padding:6px 10px">
+                    <option value="">选择文件夹</option>
+                </select>
+                <button class="btn btn-sm" onclick="batchMove()">批量移动</button>
+                <button class="btn btn-sm btn-danger" onclick="batchDelete()">批量删除</button>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell edit-only"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>系统编号</th>
+                            <th>名称</th>
+                            <th class="hide-mobile">分类</th>
+                            <th class="hide-mobile">估价</th>
+                            <th class="hide-mobile">入库日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collectionsTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="collectionsEmpty" class="empty-state hidden">暂无收藏品数据</div>
+        </div>
+
+        <!-- 分类管理面板 -->
+        <div id="categoriesPanel" class="panel">
+            <div class="mb-20 edit-only">
+                <button class="btn btn-primary" onclick="showAddCategory()">新增分类</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>分类名称</th>
+                        <th>备注</th>
+                        <th>收藏品数量</th>
+                        <th class="edit-only">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="categoriesTable">
+                </tbody>
+            </table>
+            <div id="categoriesEmpty" class="empty-state hidden">暂无分类数据</div>
+        </div>
+
+        <!-- 文件夹管理面板 -->
+        <div id="foldersPanel" class="panel">
+            <div class="mb-20 edit-only">
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                    <select id="folderCategorySelect" style="padding:8px 12px;border:1px solid #ddd">
+                        <option value="">选择分类</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="showAddFolder()">新增文件夹</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>文件夹名称</th>
+                        <th>所属分类</th>
+                        <th>备注</th>
+                        <th>收藏品数量</th>
+                        <th class="edit-only">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="foldersTable">
+                </tbody>
+            </table>
+            <div id="foldersEmpty" class="empty-state hidden">暂无文件夹数据</div>
+        </div>
+
+        <!-- 币种管理面板 -->
+        <div id="currenciesPanel" class="panel">
+            <div class="mb-20 edit-only">
+                <button class="btn btn-primary" onclick="showAddCurrency()">新增币种</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>币种代码</th>
+                        <th>币种名称</th>
+                        <th>备注</th>
+                        <th class="edit-only">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="currenciesTable">
+                </tbody>
+            </table>
+            <div id="currenciesEmpty" class="empty-state hidden">暂无币种数据</div>
+        </div>
+    </div>
+
+    <!-- 通用模态框 -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <h3>确认</h3>
+                <button class="modal-close" onclick="closeConfirm()">&times;</button>
+            </div>
+            <p id="confirmMessage"></p>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeConfirm()">取消</button>
+                <button class="btn btn-danger" id="confirmBtn">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据存储 ====================
+        let appData = {
+            categories: [],
+            folders: [],
+            collections: [],
+            currencies: [
+                { id: '1', code: 'USD', name: '美元', note: '' },
+                { id: '2', code: 'CNY', name: '人民币', note: '' },
+                { id: '3', code: 'EUR', name: '欧元', note: '' },
+                { id: '4', code: 'JPY', name: '日元', note: '' },
+                { id: '5', code: 'GBP', name: '英镑', note: '' },
+                { id: '6', code: 'HKD', name: '港币', note: '' },
+                { id: '7', code: 'TWD', name: '新台币', note: '' }
+            ],
+            nextCollectionId: 1
+        };
+
+        let isPreviewMode = false;
+        let isLoggedIn = false;
+        let selectedCollections = new Set();
+        const PASSWORD = 'Carter0502';
+        const REMEMBER_KEY = 'collectionSystemRemember';
+        const REMEMBER_DURATION = 6 * 60 * 60 * 1000; // 6小时（毫秒）
+
+        // 安全检测：每0.1秒检测一次，如果在后台但没有登录则自动退出
+        setInterval(function() {
+            const mainPage = document.getElementById('mainPage');
+            const isInSystem = mainPage && !mainPage.classList.contains('hidden');
+            if (isInSystem && !isLoggedIn) {
+                logout();
+            }
+        }, 100);
+
+        // ==================== 初始化 ====================
+        function init() {
+            loadData();
+            setupTabs();
+            renderAll();
+            
+            // 检查记住我状态，如果有效则自动登录
+            if (checkRememberMe()) {
+                isPreviewMode = false;
+                isLoggedIn = true;
+                showMainPage();
+            }
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('collectionSystemData');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch (e) {
+                    console.error('加载数据失败');
+                }
+            }
+            // 检查嵌入数据
+            const embeddedData = document.getElementById('embeddedData');
+            if (embeddedData && embeddedData.textContent.trim()) {
+                try {
+                    const data = JSON.parse(embeddedData.textContent);
+                    appData = data;
+                    saveData();
+                } catch (e) {
+                    console.error('解析嵌入数据失败');
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('collectionSystemData', JSON.stringify(appData));
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + 'Panel').classList.add('active');
+                });
+            });
+        }
+
+        // ==================== 登录相关 ====================
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('passwordInput');
+            const toggleBtn = document.getElementById('togglePwdBtn');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                toggleBtn.textContent = '隐藏';
+            } else {
+                pwdInput.type = 'password';
+                toggleBtn.textContent = '显示';
+            }
+        }
+
+        function checkRememberMe() {
+            const rememberData = localStorage.getItem(REMEMBER_KEY);
+            if (rememberData) {
+                try {
+                    const data = JSON.parse(rememberData);
+                    const now = Date.now();
+                    if (data.expiry && now < data.expiry) {
+                        // 记住我有效，自动登录
+                        return true;
+                    } else {
+                        // 已过期，清除
+                        localStorage.removeItem(REMEMBER_KEY);
+                    }
+                } catch (e) {
+                    localStorage.removeItem(REMEMBER_KEY);
+                }
+            }
+            return false;
+        }
+
+        function setRememberMe() {
+            const rememberCheck = document.getElementById('rememberMe');
+            if (rememberCheck && rememberCheck.checked) {
+                const expiry = Date.now() + REMEMBER_DURATION;
+                localStorage.setItem(REMEMBER_KEY, JSON.stringify({ expiry: expiry }));
+            }
+        }
+
+        function clearRememberMe() {
+            localStorage.removeItem(REMEMBER_KEY);
+        }
+
+        function login() {
+            const pwd = document.getElementById('passwordInput').value;
+            if (pwd === PASSWORD) {
+                setRememberMe();
+                isPreviewMode = false;
+                isLoggedIn = true;
+                showMainPage();
+            } else {
+                alert('密码错误');
+            }
+        }
+
+        function enterPreview() {
+            isPreviewMode = true;
+            isLoggedIn = true;
+            showMainPage();
+        }
+
+        function showMainPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            if (isPreviewMode) {
+                document.getElementById('previewBanner').classList.remove('hidden');
+                document.querySelectorAll('.edit-only').forEach(el => el.classList.add('hidden'));
+            } else {
+                document.getElementById('previewBanner').classList.add('hidden');
+                document.querySelectorAll('.edit-only').forEach(el => el.classList.remove('hidden'));
+            }
+            renderAll();
+        }
+
+        function showLoginFromPreview() {
+            isLoggedIn = false;
+            isPreviewMode = false;
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            isPreviewMode = false;
+            clearRememberMe();
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordInput').type = 'password';
+            document.getElementById('togglePwdBtn').textContent = '显示';
+            document.getElementById('rememberMe').checked = false;
+        }
+
+        document.getElementById('passwordInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // ==================== 渲染函数 ====================
+        function renderAll() {
+            renderCategories();
+            renderFolders();
+            renderCurrencies();
+            renderCollections();
+            updateFilters();
+        }
+
+        function updateFilters() {
+            const filterCat = document.getElementById('filterCategory');
+            const filterFolder = document.getElementById('filterFolder');
+            const batchCat = document.getElementById('batchCategory');
+            const batchFolder = document.getElementById('batchFolder');
+            const folderCatSelect = document.getElementById('folderCategorySelect');
+
+            [filterCat, batchCat, folderCatSelect].forEach(select => {
+                const val = select.value;
+                select.innerHTML = '<option value="">全部分类</option>';
+                if (select === folderCatSelect) select.innerHTML = '<option value="">选择分类</option>';
+                appData.categories.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+                select.value = val;
+            });
+
+            updateFolderFilter();
+        }
+
+        function updateFolderFilter() {
+            const catId = document.getElementById('filterCategory').value;
+            const filterFolder = document.getElementById('filterFolder');
+            const batchFolder = document.getElementById('batchFolder');
+
+            [filterFolder, batchFolder].forEach(select => {
+                const val = select.value;
+                select.innerHTML = '<option value="">全部文件夹</option>';
+                const folders = catId ? appData.folders.filter(f => f.categoryId === catId) : appData.folders;
+                folders.forEach(folder => {
+                    select.innerHTML += `<option value="${folder.id}">${folder.name}</option>`;
+                });
+            });
+        }
+
+        document.getElementById('filterCategory').addEventListener('change', updateFolderFilter);
+        document.getElementById('batchCategory').addEventListener('change', function() {
+            const catId = this.value;
+            const batchFolder = document.getElementById('batchFolder');
+            batchFolder.innerHTML = '<option value="">选择文件夹</option>';
+            appData.folders.filter(f => f.categoryId === catId).forEach(folder => {
+                batchFolder.innerHTML += `<option value="${folder.id}">${folder.name}</option>`;
+            });
+        });
+
+        // ==================== 分类管理 ====================
+        function renderCategories() {
+            const tbody = document.getElementById('categoriesTable');
+            const empty = document.getElementById('categoriesEmpty');
+
+            if (appData.categories.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = appData.categories.map(cat => {
+                const count = appData.collections.filter(c => c.categoryId === cat.id).length;
+                return `
+                    <tr>
+                        <td>${escapeHtml(cat.name)}</td>
+                        <td>${escapeHtml(cat.note || '-')}</td>
+                        <td>${count}</td>
+                        <td class="edit-only">
+                            <div class="actions">
+                                <button class="btn btn-sm" onclick="showEditCategory('${cat.id}')">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCategory('${cat.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddCategory() {
+            showModal('新增分类', `
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input type="text" id="catName" placeholder="输入分类名称">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="catNote" placeholder="输入备注（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCategory()">保存</button>
+                </div>
+            `);
+        }
+
+        function showEditCategory(id) {
+            const cat = appData.categories.find(c => c.id === id);
+            if (!cat) return;
+            showModal('编辑分类', `
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input type="text" id="catName" value="${escapeHtml(cat.name)}">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="catNote">${escapeHtml(cat.note || '')}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCategory('${id}')">保存</button>
+                </div>
+            `);
+        }
+
+        function saveCategory(id) {
+            const name = document.getElementById('catName').value.trim();
+            const note = document.getElementById('catNote').value.trim();
+            if (!name) {
+                alert('请输入分类名称');
+                return;
+            }
+            if (id) {
+                const cat = appData.categories.find(c => c.id === id);
+                if (cat) {
+                    cat.name = name;
+                    cat.note = note;
+                }
+            } else {
+                appData.categories.push({
+                    id: generateId(),
+                    name,
+                    note
+                });
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        }
+
+        function deleteCategory(id) {
+            const count = appData.collections.filter(c => c.categoryId === id).length;
+            if (count > 0) {
+                showConfirm(`该分类下有 ${count} 个收藏品，确定要删除吗？所有相关收藏品的分类将被清空。`, () => {
+                    appData.collections.forEach(c => {
+                        if (c.categoryId === id) {
+                            c.categoryId = '';
+                            c.folderId = '';
+                        }
+                    });
+                    appData.folders = appData.folders.filter(f => f.categoryId !== id);
+                    appData.categories = appData.categories.filter(c => c.id !== id);
+                    saveData();
+                    renderAll();
+                });
+            } else {
+                showConfirm('确定要删除该分类吗？', () => {
+                    appData.folders = appData.folders.filter(f => f.categoryId !== id);
+                    appData.categories = appData.categories.filter(c => c.id !== id);
+                    saveData();
+                    renderAll();
+                });
+            }
+        }
+
+        // ==================== 文件夹管理 ====================
+        function renderFolders() {
+            const tbody = document.getElementById('foldersTable');
+            const empty = document.getElementById('foldersEmpty');
+
+            if (appData.folders.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = appData.folders.map(folder => {
+                const cat = appData.categories.find(c => c.id === folder.categoryId);
+                const count = appData.collections.filter(c => c.folderId === folder.id).length;
+                return `
+                    <tr>
+                        <td>${escapeHtml(folder.name)}</td>
+                        <td>${cat ? escapeHtml(cat.name) : '-'}</td>
+                        <td>${escapeHtml(folder.note || '-')}</td>
+                        <td>${count}</td>
+                        <td class="edit-only">
+                            <div class="actions">
+                                <button class="btn btn-sm" onclick="showEditFolder('${folder.id}')">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteFolder('${folder.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddFolder() {
+            const catId = document.getElementById('folderCategorySelect').value;
+            if (!catId) {
+                alert('请先选择分类');
+                return;
+            }
+            showModal('新增文件夹', `
+                <div class="form-group">
+                    <label>文件夹名称</label>
+                    <input type="text" id="folderName" placeholder="输入文件夹名称">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="folderNote" placeholder="输入备注（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveFolder('', '${catId}')">保存</button>
+                </div>
+            `);
+        }
+
+        function showEditFolder(id) {
+            const folder = appData.folders.find(f => f.id === id);
+            if (!folder) return;
+            showModal('编辑文件夹', `
+                <div class="form-group">
+                    <label>文件夹名称</label>
+                    <input type="text" id="folderName" value="${escapeHtml(folder.name)}">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="folderNote">${escapeHtml(folder.note || '')}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveFolder('${id}', '${folder.categoryId}')">保存</button>
+                </div>
+            `);
+        }
+
+        function saveFolder(id, categoryId) {
+            const name = document.getElementById('folderName').value.trim();
+            const note = document.getElementById('folderNote').value.trim();
+            if (!name) {
+                alert('请输入文件夹名称');
+                return;
+            }
+            if (id) {
+                const folder = appData.folders.find(f => f.id === id);
+                if (folder) {
+                    folder.name = name;
+                    folder.note = note;
+                }
+            } else {
+                appData.folders.push({
+                    id: generateId(),
+                    categoryId,
+                    name,
+                    note
+                });
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        }
+
+        function deleteFolder(id) {
+            const count = appData.collections.filter(c => c.folderId === id).length;
+            if (count > 0) {
+                showConfirm(`该文件夹下有 ${count} 个收藏品，确定要删除吗？所有相关收藏品的文件夹将被清空。`, () => {
+                    appData.collections.forEach(c => {
+                        if (c.folderId === id) c.folderId = '';
+                    });
+                    appData.folders = appData.folders.filter(f => f.id !== id);
+                    saveData();
+                    renderAll();
+                });
+            } else {
+                showConfirm('确定要删除该文件夹吗？', () => {
+                    appData.folders = appData.folders.filter(f => f.id !== id);
+                    saveData();
+                    renderAll();
+                });
+            }
+        }
+
+        // ==================== 币种管理 ====================
+        function renderCurrencies() {
+            const tbody = document.getElementById('currenciesTable');
+            const empty = document.getElementById('currenciesEmpty');
+
+            if (appData.currencies.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = appData.currencies.map(cur => `
+                <tr>
+                    <td>${escapeHtml(cur.code)}</td>
+                    <td>${escapeHtml(cur.name)}</td>
+                    <td>${escapeHtml(cur.note || '-')}</td>
+                    <td class="edit-only">
+                        <div class="actions">
+                            <button class="btn btn-sm" onclick="showEditCurrency('${cur.id}')">编辑</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCurrency('${cur.id}')">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddCurrency() {
+            showModal('新增币种', `
+                <div class="form-group">
+                    <label>币种代码</label>
+                    <input type="text" id="curCode" placeholder="如 USD, CNY">
+                </div>
+                <div class="form-group">
+                    <label>币种名称</label>
+                    <input type="text" id="curName" placeholder="如 美元, 人民币">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="curNote" placeholder="输入备注（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCurrency()">保存</button>
+                </div>
+            `);
+        }
+
+        function showEditCurrency(id) {
+            const cur = appData.currencies.find(c => c.id === id);
+            if (!cur) return;
+            showModal('编辑币种', `
+                <div class="form-group">
+                    <label>币种代码</label>
+                    <input type="text" id="curCode" value="${escapeHtml(cur.code)}">
+                </div>
+                <div class="form-group">
+                    <label>币种名称</label>
+                    <input type="text" id="curName" value="${escapeHtml(cur.name)}">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="curNote">${escapeHtml(cur.note || '')}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCurrency('${id}')">保存</button>
+                </div>
+            `);
+        }
+
+        function saveCurrency(id) {
+            const code = document.getElementById('curCode').value.trim();
+            const name = document.getElementById('curName').value.trim();
+            const note = document.getElementById('curNote').value.trim();
+            if (!code || !name) {
+                alert('请输入币种代码和名称');
+                return;
+            }
+            if (id) {
+                const cur = appData.currencies.find(c => c.id === id);
+                if (cur) {
+                    cur.code = code;
+                    cur.name = name;
+                    cur.note = note;
+                }
+            } else {
+                appData.currencies.push({
+                    id: generateId(),
+                    code,
+                    name,
+                    note
+                });
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        }
+
+        function deleteCurrency(id) {
+            showConfirm('确定要删除该币种吗？', () => {
+                appData.currencies = appData.currencies.filter(c => c.id !== id);
+                saveData();
+                renderAll();
+            });
+        }
+
+        // ==================== 收藏品管理 ====================
+        function renderCollections() {
+            const tbody = document.getElementById('collectionsTable');
+            const empty = document.getElementById('collectionsEmpty');
+            
+            let filtered = filterCollectionData();
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map(col => {
+                const cat = appData.categories.find(c => c.id === col.categoryId);
+                return `
+                    <tr>
+                        <td class="checkbox-cell edit-only">
+                            <input type="checkbox" class="col-checkbox" data-id="${col.id}" 
+                                ${selectedCollections.has(col.id) ? 'checked' : ''} 
+                                onchange="toggleSelect('${col.id}')">
+                        </td>
+                        <td>${escapeHtml(col.sysNo)}</td>
+                        <td>${escapeHtml(col.name)}</td>
+                        <td class="hide-mobile">${cat ? escapeHtml(cat.name) : '-'}</td>
+                        <td class="hide-mobile">${col.valuationAmount ? col.valuationAmount + ' ' + (col.valuationCurrency || '') : '-'}</td>
+                        <td class="hide-mobile">${col.storageDate || '-'}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm" onclick="showCollectionDetail('${col.id}')">查看</button>
+                                <button class="btn btn-sm edit-only" onclick="showEditCollection('${col.id}')">编辑</button>
+                                <button class="btn btn-sm btn-danger edit-only" onclick="deleteCollection('${col.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateBatchBar();
+        }
+
+        function filterCollectionData() {
+            const catId = document.getElementById('filterCategory').value;
+            const folderId = document.getElementById('filterFolder').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            return appData.collections.filter(col => {
+                if (catId && col.categoryId !== catId) return false;
+                if (folderId && col.folderId !== folderId) return false;
+                if (search && !col.name.toLowerCase().includes(search) && !col.sysNo.toLowerCase().includes(search)) return false;
+                return true;
+            });
+        }
+
+        function filterCollections() {
+            renderCollections();
+        }
+
+        function showAddCollection() {
+            const sysNo = 'COL' + String(appData.nextCollectionId).padStart(6, '0');
+            showCollectionForm(null, sysNo);
+        }
+
+        function showEditCollection(id) {
+            const col = appData.collections.find(c => c.id === id);
+            if (!col) return;
+            showCollectionForm(col, col.sysNo);
+        }
+
+        function showCollectionForm(col, sysNo) {
+            const catOptions = appData.categories.map(c => 
+                `<option value="${c.id}" ${col && col.categoryId === c.id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+            ).join('');
+
+            const curOptions = appData.currencies.map(c => 
+                `<option value="${c.code}" ${col && col.denominationCurrency === c.code ? 'selected' : ''}>${escapeHtml(c.code)} - ${escapeHtml(c.name)}</option>`
+            ).join('');
+
+            const valCurOptions = appData.currencies.map(c => 
+                `<option value="${c.code}" ${col && col.valuationCurrency === c.code ? 'selected' : ''}>${escapeHtml(c.code)} - ${escapeHtml(c.name)}</option>`
+            ).join('');
+
+            const images = col ? (col.images || []) : [];
+
+            showModal(col ? '编辑收藏品' : '新增收藏品', `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>系统编号</label>
+                        <input type="text" id="colSysNo" value="${sysNo}" readonly style="background:#f5f5f5">
+                    </div>
+                    <div class="form-group">
+                        <label>自定义编号</label>
+                        <input type="text" id="colCustomNo" value="${col ? escapeHtml(col.customNo || '') : ''}" placeholder="可选">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" id="colName" value="${col ? escapeHtml(col.name) : ''}" placeholder="收藏品名称">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select id="colCategory" onchange="updateColFolders()">
+                            <option value="">选择分类</option>
+                            ${catOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>文件夹</label>
+                        <select id="colFolder">
+                            <option value="">选择文件夹</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>面额</label>
+                        <input type="text" id="colDenomination" value="${col ? escapeHtml(col.denomination || '') : ''}" placeholder="面额数值">
+                    </div>
+                    <div class="form-group">
+                        <label>面额币种</label>
+                        <select id="colDenominationCur">
+                            <option value="">选择币种</option>
+                            ${curOptions}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>估价</label>
+                        <input type="text" id="colValuation" value="${col ? escapeHtml(col.valuationAmount || '') : ''}" placeholder="估价金额">
+                    </div>
+                    <div class="form-group">
+                        <label>估价币种</label>
+                        <select id="colValuationCur">
+                            <option value="">选择币种</option>
+                            ${valCurOptions}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>入库日期</label>
+                        <input type="date" id="colStorageDate" value="${col ? col.storageDate || '' : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>生产/印刷日期</label>
+                        <input type="date" id="colProductionDate" value="${col ? col.productionDate || '' : ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>图片URL（最多25张）</label>
+                    <div id="imageInputs">
+                        ${images.map((img, i) => `
+                            <div style="display:flex;gap:5px;margin-bottom:5px">
+                                <input type="text" class="img-url" value="${escapeHtml(img)}" placeholder="图片URL" style="flex:1">
+                                <button type="button" class="btn btn-sm" onclick="this.parentElement.remove()">移除</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="addImageInput()" id="addImgBtn">添加图片</button>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="colNote" placeholder="备注信息">${col ? escapeHtml(col.note || '') : ''}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCollection('${col ? col.id : ''}')">保存</button>
+                </div>
+            `, () => {
+                if (col && col.categoryId) {
+                    document.getElementById('colCategory').value = col.categoryId;
+                    updateColFolders();
+                    if (col.folderId) {
+                        document.getElementById('colFolder').value = col.folderId;
+                    }
+                }
+                if (col && col.denominationCurrency) {
+                    document.getElementById('colDenominationCur').value = col.denominationCurrency;
+                }
+                if (col && col.valuationCurrency) {
+                    document.getElementById('colValuationCur').value = col.valuationCurrency;
+                }
+            });
+        }
+
+        function updateColFolders() {
+            const catId = document.getElementById('colCategory').value;
+            const folderSelect = document.getElementById('colFolder');
+            folderSelect.innerHTML = '<option value="">选择文件夹</option>';
+            if (catId) {
+                appData.folders.filter(f => f.categoryId === catId).forEach(f => {
+                    folderSelect.innerHTML += `<option value="${f.id}">${escapeHtml(f.name)}</option>`;
+                });
+            }
+        }
+
+        function addImageInput() {
+            const container = document.getElementById('imageInputs');
+            const count = container.querySelectorAll('.img-url').length;
+            if (count >= 25) {
+                alert('最多添加25张图片');
+                return;
+            }
+            const div = document.createElement('div');
+            div.style.cssText = 'display:flex;gap:5px;margin-bottom:5px';
+            div.innerHTML = `
+                <input type="text" class="img-url" placeholder="图片URL" style="flex:1">
+                <button type="button" class="btn btn-sm" onclick="this.parentElement.remove()">移除</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function saveCollection(id) {
+            const name = document.getElementById('colName').value.trim();
+            if (!name) {
+                alert('请输入收藏品名称');
+                return;
+            }
+
+            const images = [];
+            document.querySelectorAll('.img-url').forEach(input => {
+                if (input.value.trim()) images.push(input.value.trim());
+            });
+
+            const data = {
+                sysNo: document.getElementById('colSysNo').value,
+                customNo: document.getElementById('colCustomNo').value.trim(),
+                name,
+                categoryId: document.getElementById('colCategory').value,
+                folderId: document.getElementById('colFolder').value,
+                denomination: document.getElementById('colDenomination').value.trim(),
+                denominationCurrency: document.getElementById('colDenominationCur').value,
+                valuationAmount: document.getElementById('colValuation').value.trim(),
+                valuationCurrency: document.getElementById('colValuationCur').value,
+                storageDate: document.getElementById('colStorageDate').value,
+                productionDate: document.getElementById('colProductionDate').value,
+                images,
+                note: document.getElementById('colNote').value.trim()
+            };
+
+            if (id) {
+                const col = appData.collections.find(c => c.id === id);
+                if (col) Object.assign(col, data);
+            } else {
+                appData.collections.push({
+                    id: generateId(),
+                    ...data
+                });
+                appData.nextCollectionId++;
+            }
+
+            saveData();
+            renderAll();
+            closeModal();
+        }
+
+        function showCollectionDetail(id) {
+            const col = appData.collections.find(c => c.id === id);
+            if (!col) return;
+
+            const cat = appData.categories.find(c => c.id === col.categoryId);
+            const folder = appData.folders.find(f => f.id === col.folderId);
+            const images = col.images || [];
+
+            showModal('收藏品详情', `
+                ${images.length > 0 ? `
+                    <div style="margin-bottom:15px">
+                        <img id="mainImage" src="${escapeHtml(images[0])}" class="detail-main-image" onerror="this.style.display='none'">
+                        ${images.length > 1 ? `
+                            <div class="detail-images">
+                                ${images.map((img, i) => `
+                                    <img src="${escapeHtml(img)}" onclick="document.getElementById('mainImage').src='${escapeHtml(img)}'" onerror="this.style.display='none'">
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">系统编号</div>
+                    <div class="detail-value">${escapeHtml(col.sysNo)}</div>
+                </div>
+                ${col.customNo ? `
+                    <div class="detail-row">
+                        <div class="detail-label">自定义编号</div>
+                        <div class="detail-value">${escapeHtml(col.customNo)}</div>
+                    </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">名称</div>
+                    <div class="detail-value">${escapeHtml(col.name)}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">分类</div>
+                    <div class="detail-value">${cat ? escapeHtml(cat.name) : '-'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">文件夹</div>
+                    <div class="detail-value">${folder ? escapeHtml(folder.name) : '-'}</div>
+                </div>
+                ${col.denomination ? `
+                    <div class="detail-row">
+                        <div class="detail-label">面额</div>
+                        <div class="detail-value">${escapeHtml(col.denomination)} ${escapeHtml(col.denominationCurrency || '')}</div>
+                    </div>
+                ` : ''}
+                ${col.valuationAmount ? `
+                    <div class="detail-row">
+                        <div class="detail-label">估价</div>
+                        <div class="detail-value">${escapeHtml(col.valuationAmount)} ${escapeHtml(col.valuationCurrency || '')}</div>
+                    </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">入库日期</div>
+                    <div class="detail-value">${col.storageDate || '-'}</div>
+                </div>
+                ${col.productionDate ? `
+                    <div class="detail-row">
+                        <div class="detail-label">生产日期</div>
+                        <div class="detail-value">${col.productionDate}</div>
+                    </div>
+                ` : ''}
+                ${col.note ? `
+                    <div class="detail-row">
+                        <div class="detail-label">备注</div>
+                        <div class="detail-value">${escapeHtml(col.note)}</div>
+                    </div>
+                ` : ''}
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">关闭</button>
+                </div>
+            `);
+        }
+
+        function deleteCollection(id) {
+            showConfirm('确定要删除该收藏品吗？', () => {
+                appData.collections = appData.collections.filter(c => c.id !== id);
+                selectedCollections.delete(id);
+                saveData();
+                renderAll();
+            });
+        }
+
+        // ==================== 批量操作 ====================
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            const filtered = filterCollectionData();
+            if (checked) {
+                filtered.forEach(c => selectedCollections.add(c.id));
+            } else {
+                filtered.forEach(c => selectedCollections.delete(c.id));
+            }
+            renderCollections();
+        }
+
+        function toggleSelect(id) {
+            if (selectedCollections.has(id)) {
+                selectedCollections.delete(id);
+            } else {
+                selectedCollections.add(id);
+            }
+            updateBatchBar();
+        }
+
+        function updateBatchBar() {
+            const bar = document.getElementById('batchBar');
+            const count = selectedCollections.size;
+            document.getElementById('selectedCount').textContent = `已选择 ${count} 项`;
+            if (count > 0 && !isPreviewMode) {
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function batchMove() {
+            const catId = document.getElementById('batchCategory').value;
+            const folderId = document.getElementById('batchFolder').value;
+            if (!catId) {
+                alert('请选择目标分类');
+                return;
+            }
+            selectedCollections.forEach(id => {
+                const col = appData.collections.find(c => c.id === id);
+                if (col) {
+                    col.categoryId = catId;
+                    col.folderId = folderId;
+                }
+            });
+            saveData();
+            selectedCollections.clear();
+            renderAll();
+        }
+
+        function batchDelete() {
+            showConfirm(`确定要删除选中的 ${selectedCollections.size} 个收藏品吗？`, () => {
+                appData.collections = appData.collections.filter(c => !selectedCollections.has(c.id));
+                selectedCollections.clear();
+                saveData();
+                renderAll();
+            });
+        }
+
+        // ==================== 导入导出 ====================
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const html = generateExportHtml(dataStr);
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `收藏管理系统_${new Date().toISOString().split('T')[0]}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateExportHtml(dataStr) {
+            // 获取当前页面的完整HTML并嵌入数据
+            const currentHtml = document.documentElement.outerHTML;
+            const dataScript = `<script id="embeddedData" type="application/json">${dataStr}<\/script>`;
+            
+            // 在</head>前插入数据
+            return '<!DOCTYPE html>\n' + currentHtml.replace('</head>', dataScript + '\n</head>');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data;
+                    const content = e.target.result;
+
+                    if (file.name.endsWith('.json')) {
+                        data = JSON.parse(content);
+                    } else {
+                        // 从HTML中提取数据
+                        const match = content.match(/<script id="embeddedData"[^>]*>([\s\S]*?)<\/script>/);
+                        if (match) {
+                            data = JSON.parse(match[1]);
+                        } else {
+                            throw new Error('无法从HTML中提取数据');
+                        }
+                    }
+
+                    if (data && data.collections) {
+                        appData = data;
+                        saveData();
+                        renderAll();
+                        alert('导入成功');
+                    } else {
+                        throw new Error('数据格式不正确');
+                    }
+                } catch (err) {
+                    alert('导入失败: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ==================== 模态框 ====================
+        function showModal(title, content, callback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+            if (callback) setTimeout(callback, 0);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function showConfirm(message, onConfirm) {
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmModal').classList.add('active');
+            document.getElementById('confirmBtn').onclick = function() {
+                closeConfirm();
+                onConfirm();
+            };
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        // ==================== 工具函数 ====================
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
